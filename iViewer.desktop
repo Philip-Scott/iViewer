@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=iViewer
+Comment=Remote iMessages for linux
+Exec=/home/###YOUR USERNAME HERE###/.local/iViewer/iViewer
+Icon=/home/###YOUR USERNAME HERE###/.local/iViewer/icon.png
+Terminal=false
+StartupNotify=true

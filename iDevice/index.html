@@ -1,0 +1,187 @@
+<!DOCTYPE HTML>
+
+<html>
+
+	<head>
+
+		<title>iMessage</title>
+		<meta charset="utf-8" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+		<link rel="stylesheet" type="text/css" href="/css/reset.css" />
+
+		<link rel="stylesheet" type="text/css" href="/js/select2/select2.css" />
+
+		<link rel="stylesheet" type="text/css" href="/css/fancybox.css" />
+
+		<link rel="stylesheet" type="text/css" href="/css/main.css" />
+
+		%%REMOTEMESSAGES_CUSTOM_THEME_PRELOADER%%
+
+		<script type="text/javascript" src="/js/jquery.js"></script>
+
+		<script type="text/javascript" src="/js/plugins.js"></script>
+
+		<script type="text/javascript" src="/js/functions.js"></script>
+
+		<script type="text/javascript" src="/js/sources.js"></script>
+
+		<script type="text/javascript" src="/js/socket.js"></script>
+
+		<!--[if lt IE 10]><script type="text/javascript" src="/js/swfobject.js"></script><![endif]-->
+
+		<!--[if lt IE 10]><script type="text/javascript" src="/js/socket_ie.js"></script><![endif]-->
+
+		<script type="text/javascript" src="/js/fancybox.js"></script>
+
+		<script type="text/javascript" src="/js/jquery.form.js"></script>
+
+		<script type="text/javascript" src="/js/parseMessage.js"></script>
+
+		<script type="text/javascript" src="/js/jquery.filestyle.js"></script>
+
+		<script type="text/javascript" src="/js/select2/select2.min.js"></script>
+
+		<script type="text/javascript" src="/js/main.js"></script>
+
+	</head>
+
+
+
+	<body>
+
+		
+
+		<div id="messages-window" class="left">
+
+			<div id="flash" class="left"></div>
+
+			<div id="messages"></div>
+
+		</div>
+
+		<div id="conversations-window" class="right">
+
+			<div class="scroll">
+
+				<div class="scrolled">
+
+					<ul id="conversations"></ul>
+
+				</div>
+
+			</div>
+
+		</div>
+
+		<div id="compose">
+
+			<form action="#" method="post" enctype="multipart/form-data" accept-charset="UTF-8">
+
+				<div class="left">
+
+					<input type="hidden" name="hashid" value="" />
+
+					<input type="hidden" name="reqUID" value="" />
+
+					<div class="recipients-pane">
+
+						<input name="recipients" id="recipients" />
+
+					</div>
+
+					<div class="file-pane">
+
+						<span class="remove">&#x00d7;</span>
+
+						<input type="file" name="file-name" id="filepicker" />
+
+					</div>
+
+					<div class="text-pane">
+
+						<div id="emoji-pane">
+
+							<div class="scroll">
+
+								<div class="scrolled">
+
+									<div id="emoji-list"></div>
+
+								</div>
+
+							</div>
+
+						</div>
+
+						<div id="emoji-button"></div>
+
+						<div id="editor" contenteditable="true"></div>
+
+						<div id="sms-toggle">
+
+							<label title="Only send as SMS">
+
+								<input type="checkbox" name="ForceAsSMS" value="1" />
+
+								<span>SMS</span>
+
+							</label>
+
+						</div>
+
+					</div>
+
+				</div>
+
+				<div class="right">
+
+					<div class="tools">
+
+						<input class="button tool" type="button" name="media" value="Media" id="media" title="Attach Photo" />
+
+						<input class="button tool" type="button" name="attach" value="Attach" id="attach" title="Attach File" />
+
+						<input class="button tool" type="button" name="new" value="New" id="new" title="New Conversation" />
+						<input class="button tool" type="button" name="settings" value="Settings" id="settings" title="Settings" />
+
+					</div>
+
+				</div>
+
+			</form>
+
+		</div>
+
+		<div id="media-pane" class="modal">
+
+			<span class="close">&#x00d7;</span>
+
+			<select id="media-albums"></select>
+
+			<h3>Photos</h3>
+
+			<div id="media-list"></div>
+
+			<div id="media-controls">
+
+				<ul id="media-pagination"></ul>
+
+			</div>
+
+			<div id="media-detail"></div>
+
+		</div>
+
+		<div id="settings-pane" class="modal">
+
+			<span class="close">&#x00d7;</span>
+
+			<h3>Settings</h3>
+
+		</div>
+
+	</body>
+
+</html>

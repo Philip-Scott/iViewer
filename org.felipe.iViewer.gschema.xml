@@ -1,0 +1,58 @@
+<schemalist>
+  <schema id="org.felipe.iViewer" path="/org/felipe/iViewer/" gettext-domain="iViewer">
+       
+    <key name="address0" type="s">
+      <default l10n="messages">""</default>
+      <summary>Address to shortcut 1</summary>
+      <description>
+           iP Address of the iDevice
+      </description>
+    </key>
+    <key name="address1" type="s">
+      <default l10n="messages">""</default>
+      <summary>Address to shortcut 2</summary>
+      <description>
+            iP Address of the iDevice
+      </description>
+    </key>
+    <key name="address2" type="s">
+      <default l10n="messages">""</default>
+      <summary>Address to shortcut 3</summary>
+      <description>
+           iP Address of the iDevice
+      </description>
+    </key>
+    
+    <key name="type0" type="i">
+      <default>-1</default>
+      <summary>type of button</summary>
+      <description>
+       0 = add new button
+       1 = iphone
+       2 = ipad
+       3 = ipod
+      </description>
+    </key>
+    <key name="type1" type="i">
+      <default>-1</default>
+      <summary>type of button</summary>
+      <description>
+       0 = add new button
+       1 = iphone
+       2 = ipad
+       3 = ipod
+      </description>
+    </key>
+    <key name="type2" type="i">
+      <default>-1</default>
+      <summary>type of button</summary>
+      <description>
+       0 = add new button
+       1 = iphone
+       2 = ipad
+       3 = ipod
+       </description>
+    </key>
+    
+  </schema>
+</schemalist>
