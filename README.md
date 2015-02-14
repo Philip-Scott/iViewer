@@ -13,8 +13,8 @@
 5.- In the iViewer folder, give "execute" permissions to the "iViewer" executable
 6.- in the terminal, cd to this directory, and execute:
 
-sudo cp org.felipe.iViewer.gschema.xml /usr/share/glib-2.0/schemas/
-sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
+$ sudo cp org.felipe.iViewer.gschema.xml /usr/share/glib-2.0/schemas/
+$ sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 7.- Enjoy! 
 
@@ -23,15 +23,15 @@ sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 In case the executables aren't working for you: 
 
-sudo apt-get install libwebkit2gtk-3.0-dev
-sudo apt-get build-dep granite-demo pantheon-calculator
-cp /usr/share/vala-0.26/vapi/webkit2gtk-4.0.vapi /usr/share/vala-0.26/vapi/webkit2gtk-3.0.vapi
-cp /usr/share/vala-0.26/vapi/webkit2gtk-4.0.deps /usr/share/vala-0.26/vapi/webkit2gtk-3.0.deps
+$ sudo apt-get install libwebkit2gtk-3.0-dev
+$ sudo apt-get build-dep granite-demo pantheon-calculator
+$ cp /usr/share/vala-0.26/vapi/webkit2gtk-4.0.vapi /usr/share/vala-0.26/vapi/webkit2gtk-3.0.vapi
+$ cp /usr/share/vala-0.26/vapi/webkit2gtk-4.0.deps /usr/share/vala-0.26/vapi/webkit2gtk-3.0.deps
 
-valac-0.26 --pkg gtk+-3.0 --pkg webkit2gtk-3.0 --pkg libnotify --pkg granite --thread --target-glib 2.32 iViewer.vala
+$ valac-0.26 --pkg gtk+-3.0 --pkg webkit2gtk-3.0 --pkg libnotify --pkg granite --thread --target-glib 2.32 iViewer.vala
 
-sudo cp org.felipe.iViewer.xml /usr/share/glib-2.0/schemas/
-sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
+$ sudo cp org.felipe.iViewer.xml /usr/share/glib-2.0/schemas/
+$ sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 
 
