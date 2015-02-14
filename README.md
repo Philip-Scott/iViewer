@@ -16,8 +16,6 @@ iViewer is an iMessage client for elementary OS. Remote messages is a tweak for 
 * sudo cp org.felipe.iViewer.gschema.xml /usr/share/glib-2.0/schemas/
 * sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
-7. Enjoy! 
-
 
 ## How to compile this app
 
