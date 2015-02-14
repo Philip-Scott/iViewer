@@ -23,11 +23,14 @@ using Notify;
 	sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 	
 	TODO:	!Run in background: using dbus? 
-			Fix Notification Icon
 			"Pakage" the app for an easyer install (Don't use ~/.local)
-			
-			Android support? 
-			
+			Android support?
+			Use sliding animation when leaving welcome screen
+			BUGS: 	When new device dialog is closed via X, i cannot open a new one (Disable the close button)
+					if new address contains "http" or https, leave as is
+					Dialog window won't open if a previous device was removed....
+					Fix Notification Icon
+					
 */
 namespace iMessage {
 
@@ -49,6 +52,25 @@ namespace iMessage {
 	private bool newdevice = false;
 	private bool running = false;
 	private string device;
+
+public class iViewer : Granite.Application {
+	protected override void activate () {
+	}
+
+	public iViewer () {
+		settings = new GLib.Settings ("org.felipe.iViewer");
+	    var variables = new Granite.Services.Paths ();
+    
+    	variables.initialize ("iViewer", "/dev/null");
+   		data_path = @"$(variables.home_folder.get_path())/.local/iViewer";
+		Object (application_id: "iViewer");    	
+    	
+		app = new MyApp (this);
+
+		app.show_all ();
+		app.present ();
+	}
+}
 	
 public class Device_Dialog : Gtk.Dialog { //New device dialog
 	
@@ -69,8 +91,7 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 		set_keep_above (true);
 		set_size_request (420, 300);
         resizable = false;
-		
-		
+			
 		var mainbox 		= this.get_content_area();
 		var title 			= new Label ("<b>Connect To Device</b>");
 		var type_label 		= new Label ("Device Type: ");
@@ -81,7 +102,7 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 		address_label.xalign = 0;
 		favorites_label.xalign = 0;
 		title.xalign = 0;
-		
+		address_label.set_tooltip_text ("Your address can be found under\n\"Remote Messages\" in your settings app");
 		
 		var type_tbox 			= new ComboBoxText ();
 		var address_tbox 	 	= new Entry ();
@@ -91,7 +112,8 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 		box.add (favorites_switch);
 			
 		this.add_button("Cancel", 2);
-		this.add_button("Connect", 1);		
+		this.add_button("Connect", 1);
+		
 		
 		var grid = new Grid ();
 		grid.attach (title,				0,  0,  1,  1);
@@ -121,7 +143,6 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 			if (address_focus == false) {
 				address_tbox.text = "192.168.1.";
 				address_focus = true; 
-
 			}
 			return false;
 		});
@@ -133,7 +154,7 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 		
 		this.response.connect((id) => {
 			switch (id) {
-			case 1:
+			case 1: //connect
 				if (address_focus == true) {
 					if (index != -1 && favorites_switch.active == true) {
 						settings.set_int (@"type$index" , type_tbox.active);
@@ -144,25 +165,29 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 				}
 				else address_tbox.set_placeholder_text ("Enter an address");
 				break;
-			case 2:
+			case 2: //cancel
 				running = false;
 				this.destroy ();
 				break;
 			}
 		});
+		
+		this.destroy.connect (() => {
+			running = false;
+		});
 	}
 }
 	
-public class MyApp : Gtk.Window {
+public class MyApp : Gtk.ApplicationWindow {
 	string[] URL = {};
 	int added_items = 0;
 	
 public Welcome WelcomeWindow () {
 	var welcome_ = new Welcome ("iViewer", "remote messages client");
-	this.Items (settings.get_int ("type0") ,settings.get_string ("address0"), welcome_);
-	this.Items (settings.get_int ("type1") ,settings.get_string ("address1"), welcome_);
-	this.Items (settings.get_int ("type2") ,settings.get_string ("address2"), welcome_);
-	this.Items (-5, "", welcome_);
+	this.Items (settings.get_int ("type0") ,settings.get_string ("address0"), welcome_, 0);
+	this.Items (settings.get_int ("type1") ,settings.get_string ("address1"), welcome_, 1);
+	this.Items (settings.get_int ("type2") ,settings.get_string ("address2"), welcome_, 2);
+	this.Items (-5, "", welcome_, 3);
 	
 	var css_theme = new CssProvider ();
 	var css_file = @"$(data_path)/custom.css";
@@ -173,27 +198,34 @@ public Welcome WelcomeWindow () {
 	return welcome_;
 }
 
-public void Items (int index, string address_, Welcome welcome_) {
+public void Items (int index, string address_, Welcome welcome_, int spot) {
 	Gtk.Image icon = new Gtk.Image ();
 	
 	switch (index + 1) {
 		case 1: //iphone
 			icon.set_from_file (@"$(data_path)/iphone.png"); 
 			welcome_.append_with_image (icon, "iPhone iMessage", "Connect to iPhone");
-			URL += "http://" + address_;
+			if (address_.contains ("http") == false) URL += "http://" + address_;
+			else URL += address_;
 			break;
 		case 2: //ipod
 			icon.set_from_file (@"$(data_path)/ipod.png");
 			welcome_.append_with_image (icon, "iPod iMessage", "Connect to iPod");
-			URL += "http://" + address_;
+			if (address_.contains ("http") == false) URL += "http://" + address_;
+			else URL += address_;
 			break;
 		case 3: //ipad
 			icon.set_from_file (@"$(data_path)/ipad.png");
 			welcome_.append_with_image (icon, "iPad iMessage", "Connect to iPad");
-			URL += "http://" + address_;
+			if (address_.contains ("http") == false) URL += "http://" + address_;
+			else URL += address_;
 			break;
 		case -4: //"Add" button
-			welcome_.append ("add", "    New Device", "    Connect to a new device");		
+			welcome_.append ("add", "    New Device", "    Connect to a new device");
+			break;		
+		default: 
+			welcome_.append ("add", "null", "Null");
+			welcome_.set_item_visible (spot, false);
 		break;	
 	}
 }	
@@ -203,7 +235,10 @@ public ScrolledWindow create_web_window (int index, string overide) {
 	
 	view = new WebKit.WebView ();
 	if (overide == "false") view.load_uri (URL[index]);
-	else view.load_uri ("http://" + overide);
+	else  {
+		if (overide.contains ("http") == false) view.load_uri ("http://" + overide);
+		else view.load_uri (overide);
+	}
  	
 	var settings = new WebKit.Settings ();
  	settings.enable_smooth_scrolling = true;
@@ -253,7 +288,7 @@ public void show_welcome () {
 	});
 	
 	this.add (welcome);
-	this.title = "iViewer";
+	this.title = "iViewer TESTING";
 	main_index = -1;
 		
 	headerbar.set_decoration_layout ("close");
@@ -266,7 +301,7 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 	headerbar.set_decoration_layout ("minimize");
 	
 	//HeaderBar Buttons	
-	refresh_button = new ToolButton.from_stock (Gtk.Stock.REFRESH);
+	refresh_button = new ToolButton.from_stock (Gtk.Stock.CLEAR);
     refresh_button.clicked.connect (() => {
         view.reload ();
         if (view.visible == false) box.remove (infobar);       
@@ -326,27 +361,35 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 	}	
 		
 	//Error bar
+	Label error_label;
 	infobar = new InfoBar ();
-	switch (settings.get_int (@"type$main_index")) {
-		case 0:
-			device = "iPhone";
-		break;
-		case 1:
-			device = "iPod";
-		break;
-		case 2:
-			device = "iPad";
-		break;		
-		default:
-			device = "Device";
-		break;
+	if (overide == "false") {
+		infobar.add_button ("Remove", 1);
+		switch (settings.get_int (@"type$main_index")) {
+			case 0:
+				device = "iPhone";
+				break;
+			case 1:
+				device = "iPod";
+				break;
+			case 2:
+				device = "iPad";
+				break;		
+			default:
+				device = "Device";
+				break;
+		}
+		error_label = new Label (@"<b>Connection to $device Failed</b>\nWould you like to remove it from favorites?");
+	} else { 
+		error_label = new Label ("<b>Connection to device Failed</b>");
+		device = "Device";
+	
 	}
 	
-	var error_label = new Label (@"<b>Connection to $device Failed</b>\nWould you like to remove it from favorites?");
 	error_label.set_use_markup (true);
 	infobar.set_message_type (MessageType.ERROR);
 	infobar.get_content_area ().add (error_label);
-	infobar.add_button ("Remove", 1);
+	
 	infobar.response.connect ((id) => {
 		settings.set_int (@"type$main_index", -1);
 		settings.set_string (@"address$main_index", "");
@@ -363,8 +406,6 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 		return false;
 	});
 	
-	
-	
     headerbar.pack_end (refresh_button);
     headerbar.pack_end (return_button);
     box.pack_end (webapp);
@@ -373,8 +414,8 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 }
 
 
-public MyApp() {
-	
+public MyApp(Gtk.Application application) {
+	//this.set_application (application);
 	this.destroy.connect (Gtk.main_quit);
 	this.width_request = 540;
 	this.height_request = 300;
@@ -387,7 +428,7 @@ public MyApp() {
     headerbar.decoration_layout_set = true;
     headerbar.show_close_button = true;
 	this.set_titlebar (headerbar);
-	this.title = "iViewer";
+	//this.title = "iViewer";
 	
 	show_welcome ();
 		
@@ -395,16 +436,9 @@ public MyApp() {
 
 public static int main (string[] args) {
 	Gtk.init (ref args);
-	settings = new GLib.Settings ("org.felipe.iViewer");
-    var variables = new Granite.Services.Paths ();
-    
-    variables.initialize ("iViewer", "/dev/null");
-    data_path = @"$(variables.home_folder.get_path())/.local/iViewer";
-    
-	
-	app = new MyApp ();
-	app.show_all ();
-	
+	var iviewer = new iViewer ();
+	iviewer.run (args);
+		
 	Gtk.main ();
 	notification.close ();
 
