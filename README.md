@@ -34,6 +34,7 @@ In case the executables aren't working for you:
 
 ## Special thanks to:
 
-- Kay van der Zander and Nicolas Laplante: for their help with vala 
-- Micah Ilbery: for the Awesome icon
+- Kay van der Zander and Nicolas Laplante: For their help with vala 
+- Daniel Fore: For his chat mockup
+- Micah Ilbery: For the Awesome icon
 
