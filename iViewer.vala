@@ -26,10 +26,10 @@ using Notify;
 			"Pakage" the app for an easyer install (Don't use ~/.local)
 			Android support?
 			Use sliding animation when leaving welcome screen
-			BUGS: 	When new device dialog is closed via X, i cannot open a new one (Disable the close button)
-					if new address contains "http" or https, leave as is
-					Dialog window won't open if a previous device was removed....
+			BUGS: 	Dialog window won't open if a previous device was removed....
 					Fix Notification Icon
+			FIXED: 	If new address contains "http" or https, leave as is	
+					When new device dialog is closed via X, i cannot open a new one (Disable the close button)
 					
 */
 namespace iMessage {
@@ -288,7 +288,7 @@ public void show_welcome () {
 	});
 	
 	this.add (welcome);
-	this.title = "iViewer TESTING";
+	this.title = "iViewer";
 	main_index = -1;
 		
 	headerbar.set_decoration_layout ("close");
@@ -301,7 +301,7 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 	headerbar.set_decoration_layout ("minimize");
 	
 	//HeaderBar Buttons	
-	refresh_button = new ToolButton.from_stock (Gtk.Stock.CLEAR);
+	refresh_button = new ToolButton.from_stock (Gtk.Stock.REFRESH);
     refresh_button.clicked.connect (() => {
         view.reload ();
         if (view.visible == false) box.remove (infobar);       
@@ -314,40 +314,40 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
     	this.destroy ();    				 
     });
     
-      	
 	//Login window
 	view.authenticate.connect (() => {
 		this.title = "Log in";
 		return false;
 	});
-	
 		
 	//NOTIFICATIONS
+	bool newmessage = false;
+	var timer = new Timer();
+	timer.start ();
 	if (notify == true) {
 		Notify.init ("iViewer");
 		string summary = "iMessage";
 		string body = "New message";
 		string icon = "empathy";
-		bool newmessage = false;
+		messages = 0;
+		
 		//string icon = "iviewer"; //TODO 
 		//var icon = new Pixbuf.from_file (@"$(data_path)/iviewer.svg"); //I would do it like this... but it adds a border
 
 		notification = new Notify.Notification (summary, body, icon);
 		notification.set_urgency (Urgency.CRITICAL);
-		//notification.show (); //TEST NOTIFICATIONS
-		//notification.set_image_from_pixbuf (icon);
 		view.notify.connect (() => { 
 			string temp;
-			//unichar c;
 			temp = view.title;
-			if (temp == "New Message" && view.has_focus == false && newmessage == false) { //Show notification
+			this.title = view.title;
+			if (temp == "New Message" && view.has_focus == false && timer.elapsed () > 9) { //Show notification
+				messages++;
+				timer.reset ();
 				newmessage = true;
-				//body = "New message";
-				//notification.update("iMessage", "New message", "empathy");
+				if (messages == 1) notification.update ("iMessage", "New messages", "empathy");
+				else notification.update ("iMessage", @"$messages new messages", "empathy");
 				notification.show ();		
 			}
-			
-			this.title = view.title;
 		});
 				
 		this.focus_in_event.connect (() => {
@@ -383,12 +383,16 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 	} else { 
 		error_label = new Label ("<b>Connection to device Failed</b>");
 		device = "Device";
-	
 	}
 	
 	error_label.set_use_markup (true);
 	infobar.set_message_type (MessageType.ERROR);
 	infobar.get_content_area ().add (error_label);
+	
+	notification.closed.connect (() => {
+		newmessage = false;
+		messages = 0;
+	});
 	
 	infobar.response.connect ((id) => {
 		settings.set_int (@"type$main_index", -1);
@@ -400,7 +404,6 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 	
 	view.load_failed.connect (() => {
 		box.pack_start (infobar, false);
-		
 		this.show_all ();
 		view.visible = false;
 		return false;
@@ -427,11 +430,8 @@ public MyApp(Gtk.Application application) {
 	headerbar.set_decoration_layout ("close");
     headerbar.decoration_layout_set = true;
     headerbar.show_close_button = true;
-	this.set_titlebar (headerbar);
-	//this.title = "iViewer";
-	
+	this.set_titlebar (headerbar);	
 	show_welcome ();
-		
 }
 
 public static int main (string[] args) {
