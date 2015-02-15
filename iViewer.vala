@@ -8,7 +8,7 @@
  * Author:
  *      Felipe Escoto 
  */
- 
+
 using GLib;
 using Gtk;
 using Gdk;
@@ -16,24 +16,22 @@ using WebKit;
 using Granite.Widgets;
 using Granite.Services;
 using Notify;
+using Unity;
 
 /*
-	valac-0.26 --pkg gtk+-3.0 --pkg webkit2gtk-3.0 --pkg libnotify --pkg granite --thread --target-glib 2.32 iViewer.vala && ./iViewer
+valac-0.26 --pkg gtk+-3.0 --pkg webkit2gtk-3.0 --pkg libnotify --pkg granite --pkg unity --thread --target-glib 2.32 iViewer.vala && ./iViewer
 	sudo cp org.felipe.iViewer*.xml /usr/share/glib-2.0/schemas/
 	sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 	
 	TODO:	!Run in background: using dbus? 
 			"Pakage" the app for an easyer install (Don't use ~/.local)
-			Android support?
 			Use sliding animation when leaving welcome screen
-			BUGS: 	Dialog window won't open if a previous device was removed....
-					Fix Notification Icon
+			BUGS: 	Fix Notification Icon
 			FIXED: 	If new address contains "http" or https, leave as is	
 					When new device dialog is closed via X, i cannot open a new one (Disable the close button)
-					
+					Dialog window won't open if a previous device was removed....
 */
 namespace iMessage {
-
 	private Gtk.Window app;
 	private Welcome welcome;
 	private WebView view;
@@ -126,8 +124,7 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 		grid.set_column_homogeneous (false);
 		grid.set_row_homogeneous (true);
 		grid.row_spacing = 12;
-	
-	
+		
 		if (index == -1) {
 			favorites_switch.set_sensitive (false);
 			favorites_switch.set_tooltip_text ("Favorite slots are full");
@@ -146,8 +143,7 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 			}
 			return false;
 		});
-		
-		
+				
 		mainbox.add (grid);
 		mainbox.spacing = 12;
 		
@@ -263,7 +259,7 @@ public ScrolledWindow create_web_window (int index, string overide) {
 public void show_welcome () {
 	this.width_request = 340;
 	this.height_request = 100;
-	this.resize (800,650);
+	this.resize (980,600);
 	this.set_title ("iViewer");
 	welcome.destroy ();
 	welcome = WelcomeWindow ();
@@ -295,7 +291,6 @@ public void show_welcome () {
 }
 
 public void new_webapp (int index, bool notify = true, string overide = "false") {
-
 	var new_iViewer = new SimpleCommand (@"$(data_path)", "./iViewer");
 	var webapp = this.create_web_window (index, overide);
 	headerbar.set_decoration_layout ("minimize");
@@ -321,44 +316,47 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 	});
 		
 	//NOTIFICATIONS
-	bool newmessage = false;
+	var launcher = LauncherEntry.get_for_desktop_id ("iViewer.desktop");
 	var timer = new Timer();
 	timer.start ();
 	if (notify == true) {
 		Notify.init ("iViewer");
 		string summary = "iMessage";
 		string body = "New message";
-		string icon = "empathy";
+		string icon = "iviewer";
 		messages = 0;
 		
 		//string icon = "iviewer"; //TODO 
 		//var icon = new Pixbuf.from_file (@"$(data_path)/iviewer.svg"); //I would do it like this... but it adds a border
-
+			
+		notification.show ();
 		notification = new Notify.Notification (summary, body, icon);
 		notification.set_urgency (Urgency.CRITICAL);
 		view.notify.connect (() => { 
 			string temp;
 			temp = view.title;
-			this.title = view.title;
+			if (temp != "New Message") this.title = view.title;
 			if (temp == "New Message" && view.has_focus == false && timer.elapsed () > 9) { //Show notification
 				messages++;
 				timer.reset ();
-				newmessage = true;
-				if (messages == 1) notification.update ("iMessage", "New messages", "empathy");
-				else notification.update ("iMessage", @"$messages new messages", "empathy");
+				launcher.count = messages;	
+				launcher.count_visible = true;
+				launcher.urgent = true;
+				if (messages == 1) notification.update ("iMessage", "New messages", "iviewer");
+				else notification.update ("iMessage", @"$messages new messages", "iviewer");
 				notification.show ();		
 			}
 		});
 				
 		this.focus_in_event.connect (() => {
-			if (newmessage == true) {
-				newmessage = false;
-				notification.close ();
-				messages = 0;
-			}
+			messages = 0;
+			notification.close ();
+			launcher.count_visible = false;
 			return false;
 		});	
-	}	
+	}
+	
+	
 		
 	//Error bar
 	Label error_label;
@@ -390,8 +388,7 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 	infobar.get_content_area ().add (error_label);
 	
 	notification.closed.connect (() => {
-		newmessage = false;
-		messages = 0;
+		launcher.urgent = false;
 	});
 	
 	infobar.response.connect ((id) => {
@@ -417,13 +414,13 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 }
 
 
-public MyApp(Gtk.Application application) {
+public MyApp (Gtk.Application application) {
 	//this.set_application (application);
 	this.destroy.connect (Gtk.main_quit);
 	this.width_request = 540;
 	this.height_request = 300;
 	this.resize (800,650);
-
+	this.set_keep_above (true);
 	box = new Box (Gtk.Orientation.VERTICAL, 0);
 	
 	headerbar = new Gtk.HeaderBar ();
@@ -431,6 +428,7 @@ public MyApp(Gtk.Application application) {
     headerbar.decoration_layout_set = true;
     headerbar.show_close_button = true;
 	this.set_titlebar (headerbar);	
+	this.set_keep_above (false);
 	show_welcome ();
 }
 
