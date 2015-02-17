@@ -6,7 +6,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
  
  * Author:
- *      Felipe Escoto 
+ *	  Felipe Escoto 
  */
 
 using GLib;
@@ -38,7 +38,7 @@ namespace iMessage {
 	private Gtk.HeaderBar headerbar;
 	private Notify.Notification notification;
 	private ToolButton refresh_button;
-    private ToolButton return_button;
+	private ToolButton return_button;
 	private GLib.Settings settings;
 	private Box box;
 	private InfoBar infobar;
@@ -49,21 +49,22 @@ namespace iMessage {
 	private string data_path;
 	private bool newdevice = false;
 	private bool running = false;
+	private bool dont_exit = false;
 	private string device;
 
-public class iViewer : Granite.Application {
-	protected override void activate () {
-	}
 
+public class iViewer : Gtk.Application {
+	
 	public iViewer () {
 		settings = new GLib.Settings ("org.felipe.iViewer");
-	    var variables = new Granite.Services.Paths ();
-    
-    	variables.initialize ("iViewer", "/dev/null");
+		var variables = new Granite.Services.Paths ();
+	
+		variables.initialize ("iViewer", "/dev/null");
    		data_path = @"$(variables.home_folder.get_path())/.local/iViewer";
-		Object (application_id: "iViewer");    	
-    	
-		app = new MyApp (this);
+		Object (application_id: "iViewer", flags: ApplicationFlags.HANDLES_COMMAND_LINE);
+			
+		//Object (application: this);
+		app = new MyApp ();
 
 		app.show_all ();
 		app.present ();
@@ -71,7 +72,7 @@ public class iViewer : Granite.Application {
 }
 	
 public class Device_Dialog : Gtk.Dialog { //New device dialog
-	
+
 	public signal void connect_device (string url);
 
 	public bool address_focus = false;
@@ -88,7 +89,7 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 		this.set_border_width (12);
 		set_keep_above (true);
 		set_size_request (420, 300);
-        resizable = false;
+		resizable = false;
 			
 		var mainbox 		= this.get_content_area();
 		var title 			= new Label ("<b>Connect To Device</b>");
@@ -177,8 +178,16 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 public class MyApp : Gtk.ApplicationWindow {
 	string[] URL = {};
 	int added_items = 0;
+
+public override bool delete_event (Gdk.EventAny event) {
+	if (dont_exit == false) app.destroy ();
+	else hide();
+	
+	return dont_exit;
+}
 	
 public Welcome WelcomeWindow () {
+	dont_exit = false;
 	var welcome_ = new Welcome ("iViewer", "remote messages client");
 	this.Items (settings.get_int ("type0") ,settings.get_string ("address0"), welcome_, 0);
 	this.Items (settings.get_int ("type1") ,settings.get_string ("address1"), welcome_, 1);
@@ -217,7 +226,7 @@ public void Items (int index, string address_, Welcome welcome_, int spot) {
 			else URL += address_;
 			break;
 		case -4: //"Add" button
-			welcome_.append ("add", "    New Device", "    Connect to a new device");
+			welcome_.append ("add", "	New Device", "	Connect to a new device");
 			break;		
 		default: 
 			welcome_.append ("add", "null", "Null");
@@ -286,29 +295,29 @@ public void show_welcome () {
 	this.add (welcome);
 	this.title = "iViewer";
 	main_index = -1;
-		
-	headerbar.set_decoration_layout ("close");
 }
 
 public void new_webapp (int index, bool notify = true, string overide = "false") {
+	var launcher = LauncherEntry.get_for_desktop_id ("iViewer.desktop");
 	var new_iViewer = new SimpleCommand (@"$(data_path)", "./iViewer");
 	var webapp = this.create_web_window (index, overide);
-	headerbar.set_decoration_layout ("minimize");
+	dont_exit = true;
+	//headerbar.set_decoration_layout ("minimize");
 	
 	//HeaderBar Buttons	
 	refresh_button = new ToolButton.from_stock (Gtk.Stock.REFRESH);
-    refresh_button.clicked.connect (() => {
-        view.reload ();
-        if (view.visible == false) box.remove (infobar);       
-        view.visible = true;
-    });
+	refresh_button.clicked.connect (() => {
+		view.reload ();
+		if (view.visible == false) box.remove (infobar);	   
+		view.visible = true;
+	});
   	  	
-    return_button = new ToolButton.from_stock (Gtk.Stock.GO_BACK);
-    return_button.clicked.connect (() => {
-    	new_iViewer.run ();
-    	this.destroy ();    				 
-    });
-    
+	return_button = new ToolButton.from_stock (Gtk.Stock.GO_BACK);
+	return_button.clicked.connect (() => {
+		new_iViewer.run ();
+		this.destroy ();					 
+	});
+	
 	//Login window
 	view.authenticate.connect (() => {
 		this.title = "Log in";
@@ -316,7 +325,6 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 	});
 		
 	//NOTIFICATIONS
-	var launcher = LauncherEntry.get_for_desktop_id ("iViewer.desktop");
 	var timer = new Timer();
 	timer.start ();
 	if (notify == true) {
@@ -327,36 +335,39 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 		messages = 0;
 		
 		//string icon = "iviewer"; //TODO 
-		//var icon = new Pixbuf.from_file (@"$(data_path)/iviewer.svg"); //I would do it like this... but it adds a border
+		var icon_pic = new Pixbuf.from_file (@"$(data_path)/iviewer.svg"); //I would do it like this... but it adds a border
 			
 		notification.show ();
 		notification = new Notify.Notification (summary, body, icon);
-		notification.set_urgency (Urgency.CRITICAL);
+		
 		view.notify.connect (() => { 
 			string temp;
 			temp = view.title;
+			//if (app.visible == true) notification.set_urgency (Urgency.CRITICAL);
+			//else notification.set_urgency (Urgency.NORMAL);
+			notification.set_urgency (Urgency.CRITICAL);
+			
 			if (temp != "New Message") this.title = view.title;
+	
 			if (temp == "New Message" && view.has_focus == false && timer.elapsed () > 9) { //Show notification
 				messages++;
 				timer.reset ();
 				launcher.count = messages;	
 				launcher.count_visible = true;
 				launcher.urgent = true;
-				if (messages == 1) notification.update ("iMessage", "New messages", "iviewer");
+				if (messages == 1) notification.update ("iMessage", "New message", "iviewer");
 				else notification.update ("iMessage", @"$messages new messages", "iviewer");
+				notification.set_image_from_pixbuf (icon_pic);
 				notification.show ();		
 			}
 		});
-				
-		this.focus_in_event.connect (() => {
+		app.focus_in_event.connect (() => {
 			messages = 0;
 			notification.close ();
 			launcher.count_visible = false;
 			return false;
 		});	
 	}
-	
-	
 		
 	//Error bar
 	Label error_label;
@@ -383,20 +394,22 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 		device = "Device";
 	}
 	
-	error_label.set_use_markup (true);
-	infobar.set_message_type (MessageType.ERROR);
-	infobar.get_content_area ().add (error_label);
-	
 	notification.closed.connect (() => {
 		launcher.urgent = false;
+		if (app.visible == true) {
+			messages = 0;
+			launcher.count_visible = false;
+			app.show ();
+		}
 	});
 	
+	//notification.clicked.connect (() => {});
 	infobar.response.connect ((id) => {
 		settings.set_int (@"type$main_index", -1);
 		settings.set_string (@"address$main_index", "");
 		
 		new_iViewer.run ();
-    	this.destroy ();
+		this.destroy ();
 	});
 	
 	view.load_failed.connect (() => {
@@ -406,16 +419,31 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 		return false;
 	});
 	
-    headerbar.pack_end (refresh_button);
-    headerbar.pack_end (return_button);
-    box.pack_end (webapp);
-    this.add (box);
+	error_label.set_use_markup (true);
+	infobar.set_message_type (MessageType.ERROR);
+	infobar.get_content_area ().add (error_label);
+	headerbar.pack_end (refresh_button);
+	headerbar.pack_end (return_button);
+	box.pack_end (webapp);
+	this.add (box);
 	this.show_all ();
 }
 
+public int new_window () {
+	if (dont_exit == true) {
+    	this.show ();
+    	this.present ();
+      	return 1;
+    }
+    else return 0;
+}
 
-public MyApp (Gtk.Application application) {
+public MyApp () {
 	//this.set_application (application);
+	// Don't create a new window, if one already exists
+    
+	if (new_window() == 0) {
+	
 	this.destroy.connect (Gtk.main_quit);
 	this.width_request = 540;
 	this.height_request = 300;
@@ -425,11 +453,12 @@ public MyApp (Gtk.Application application) {
 	
 	headerbar = new Gtk.HeaderBar ();
 	headerbar.set_decoration_layout ("close");
-    headerbar.decoration_layout_set = true;
-    headerbar.show_close_button = true;
+	headerbar.decoration_layout_set = true;
+	headerbar.show_close_button = true;
 	this.set_titlebar (headerbar);	
 	this.set_keep_above (false);
 	show_welcome ();
+	}
 }
 
 public static int main (string[] args) {
