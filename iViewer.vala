@@ -72,10 +72,8 @@ public class iViewer : Gtk.Application {
 			app = new MyApp ();
 			app.show_all ();
 		}
-		else app = get_active_window ();
-		//app.present ();
-		
-		
+		else app = this.get_active_window ();
+		app.present ();
 	}
 	
 	public iViewer () {
