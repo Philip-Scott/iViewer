@@ -62,9 +62,7 @@ public class iViewer : Gtk.Application {
 		iviewer.run (args);
 		//iviewer.activate ();	
 		Gtk.main ();
-		//notification.close ();
-
-	return 0;
+		return 0;
 	}
 
 	public override void activate () {
