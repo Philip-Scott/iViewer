@@ -32,42 +32,59 @@ valac-0.26 --pkg gtk+-3.0 --pkg webkit2gtk-3.0 --pkg libnotify --pkg granite --p
 					Dialog window won't open if a previous device was removed....
 */
 namespace iMessage {
-	private Gtk.Window app;
-	private Welcome welcome;
-	private WebView view;
-	private Gtk.HeaderBar headerbar;
-	private Notify.Notification notification;
-	private ToolButton refresh_button;
-	private ToolButton return_button;
-	private GLib.Settings settings;
-	private Box box;
-	private InfoBar infobar;
+	public Gtk.Window app = null;
+	public Welcome welcome;
+	public WebView view;
+	public Gtk.HeaderBar headerbar;
+	public Notify.Notification notification;
+	public ToolButton refresh_button;
+	public ToolButton return_button;
+	public GLib.Settings settings;
+	public Box box;
+	public InfoBar infobar;
 
-	private int main_index;	
-	private int messages = 0;
-	private int type[3]; 
-	private string data_path;
-	private bool newdevice = false;
-	private bool running = false;
-	private bool dont_exit = false;
-	private string device;
+	public int main_index;	
+	public int messages = 0;
+	public int type[3]; 
+	public string data_path;
+	public bool newdevice = false;
+	public bool running = false;
+	public bool dont_exit = false;
+	public string device;
 
 
 public class iViewer : Gtk.Application {
 	
+	public static int main (string[] args) {
+		Gtk.init (ref args);
+	
+		var iviewer = new iViewer ();
+		iviewer.run (args);
+		//iviewer.activate ();	
+		Gtk.main ();
+		//notification.close ();
+
+	return 0;
+	}
+
+	public override void activate () {
+		if (app == null) { 
+			app = new MyApp ();
+			app.show_all ();
+		}
+		else app = get_active_window ();
+		//app.present ();
+		
+		
+	}
+	
 	public iViewer () {
+		Object (application_id: "i.Viewer");
 		settings = new GLib.Settings ("org.felipe.iViewer");
 		var variables = new Granite.Services.Paths ();
 	
 		variables.initialize ("iViewer", "/dev/null");
    		data_path = @"$(variables.home_folder.get_path())/.local/iViewer";
-		Object (application_id: "iViewer", flags: ApplicationFlags.HANDLES_COMMAND_LINE);
-			
-		//Object (application: this);
-		app = new MyApp ();
-
-		app.show_all ();
-		app.present ();
 	}
 }
 	
@@ -460,14 +477,4 @@ public MyApp () {
 	show_welcome ();
 	}
 }
-
-public static int main (string[] args) {
-	Gtk.init (ref args);
-	var iviewer = new iViewer ();
-	iviewer.run (args);
-		
-	Gtk.main ();
-	notification.close ();
-
-return 0;
-}}}
+}}
