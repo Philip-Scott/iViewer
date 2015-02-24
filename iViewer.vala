@@ -25,11 +25,11 @@ valac-0.26 --pkg gtk+-3.0 --pkg webkit2gtk-3.0 --pkg libnotify --pkg granite --p
 	
 	TODO:	!Run in background: using dbus? 
 			"Pakage" the app for an easyer install (Don't use ~/.local)
-			Use sliding animation when leaving welcome screen
-			BUGS: 	Fix Notification Icon
+			Use sliding animation when leaving welcome screen	
 			FIXED: 	If new address contains "http" or https, leave as is	
 					When new device dialog is closed via X, i cannot open a new one (Disable the close button)
 					Dialog window won't open if a previous device was removed....
+					Fix Notification Icon
 */
 namespace iMessage {
 	public Gtk.Window app = null;
@@ -51,20 +51,9 @@ namespace iMessage {
 	public bool running = false;
 	public bool dont_exit = false;
 	public string device;
-
+	public const string data_dir = "/usr/share/iViewer/";
 
 public class iViewer : Gtk.Application {
-	
-	public static int main (string[] args) {
-		Gtk.init (ref args);
-	
-		var iviewer = new iViewer ();
-		iviewer.run (args);
-		//iviewer.activate ();	
-		Gtk.main ();
-		return 0;
-	}
-
 	public override void activate () {
 		if (app == null) { 
 			app = new MyApp ();
@@ -193,8 +182,8 @@ public class MyApp : Gtk.ApplicationWindow {
 	int added_items = 0;
 
 public override bool delete_event (Gdk.EventAny event) {
-	if (dont_exit == false) app.destroy ();
-	else hide();
+	if (dont_exit == false) this.destroy ();
+	else this.destroy (); //hide(); //Always destroy app until backgrounding support is fixed
 	
 	return dont_exit;
 }
@@ -221,25 +210,25 @@ public void Items (int index, string address_, Welcome welcome_, int spot) {
 	
 	switch (index + 1) {
 		case 1: //iphone
-			icon.set_from_file (@"$(data_path)/iphone.png"); 
+			icon.set_from_file (@"$(data_dir)/iphone.png"); 
 			welcome_.append_with_image (icon, "iPhone iMessage", "Connect to iPhone");
 			if (address_.contains ("http") == false) URL += "http://" + address_;
 			else URL += address_;
 			break;
 		case 2: //ipod
-			icon.set_from_file (@"$(data_path)/ipod.png");
+			icon.set_from_file (@"$(data_dir)/ipod.png");
 			welcome_.append_with_image (icon, "iPod iMessage", "Connect to iPod");
 			if (address_.contains ("http") == false) URL += "http://" + address_;
 			else URL += address_;
 			break;
 		case 3: //ipad
-			icon.set_from_file (@"$(data_path)/ipad.png");
+			icon.set_from_file (@"$(data_dir)/ipad.png");
 			welcome_.append_with_image (icon, "iPad iMessage", "Connect to iPad");
 			if (address_.contains ("http") == false) URL += "http://" + address_;
 			else URL += address_;
 			break;
 		case -4: //"Add" button
-			welcome_.append ("add", "	New Device", "	Connect to a new device");
+			welcome_.append ("add", "   New Device", "   Connect to a new device");
 			break;		
 		default: 
 			welcome_.append ("add", "null", "Null");
@@ -282,7 +271,7 @@ public void show_welcome () {
 	this.width_request = 340;
 	this.height_request = 100;
 	this.resize (980,600);
-	this.set_title ("iViewer");
+	//this.set_title ("iViewer");
 	welcome.destroy ();
 	welcome = WelcomeWindow ();
 	
@@ -344,12 +333,9 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 		Notify.init ("iViewer");
 		string summary = "iMessage";
 		string body = "New message";
-		string icon = "iviewer";
+		string icon = "iViewer";
 		messages = 0;
 		
-		//string icon = "iviewer"; //TODO 
-		var icon_pic = new Pixbuf.from_file (@"$(data_path)/iviewer.svg"); //I would do it like this... but it adds a border
-			
 		notification.show ();
 		notification = new Notify.Notification (summary, body, icon);
 		
@@ -358,19 +344,17 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 			temp = view.title;
 			//if (app.visible == true) notification.set_urgency (Urgency.CRITICAL);
 			//else notification.set_urgency (Urgency.NORMAL);
+			//notification.show ();
 			notification.set_urgency (Urgency.CRITICAL);
-			
 			if (temp != "New Message") this.title = view.title;
-	
 			if (temp == "New Message" && view.has_focus == false && timer.elapsed () > 9) { //Show notification
 				messages++;
 				timer.reset ();
 				launcher.count = messages;	
 				launcher.count_visible = true;
 				launcher.urgent = true;
-				if (messages == 1) notification.update ("iMessage", "New message", "iviewer");
-				else notification.update ("iMessage", @"$messages new messages", "iviewer");
-				notification.set_image_from_pixbuf (icon_pic);
+				if (messages == 1) notification.update ("iMessage", "New message", "iViewer");
+				else notification.update ("iMessage", @"$messages new messages", "iViewer");
 				notification.show ();		
 			}
 		});
@@ -473,4 +457,15 @@ public MyApp () {
 	show_welcome ();
 	}
 }
+public static int main (string[] args) {
+		Gtk.init (ref args);
+	
+		var iviewer = new iViewer ();
+		iviewer.run (args);
+		//iviewer.activate ();	
+		Gtk.main ();
+		//notification.close ();
+
+	return 0;
+	}
 }}
