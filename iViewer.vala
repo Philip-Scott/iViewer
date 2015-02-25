@@ -24,11 +24,11 @@ valac-0.26 --pkg gtk+-3.0 --pkg webkit2gtk-3.0 --pkg libnotify --pkg granite --p
 	sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 	
 	TODO:	!Run in background: using dbus? 
-			"Pakage" the app for an easyer install (Don't use ~/.local)
 			Use sliding animation when leaving welcome screen	
 			FIXED: 	If new address contains "http" or https, leave as is	
 					When new device dialog is closed via X, i cannot open a new one (Disable the close button)
 					Dialog window won't open if a previous device was removed....
+					"Pakage" the app for an easyer install (Don't use ~/.local)
 					Fix Notification Icon
 */
 namespace iMessage {
@@ -197,7 +197,7 @@ public Welcome WelcomeWindow () {
 	this.Items (-5, "", welcome_, 3);
 	
 	var css_theme = new CssProvider ();
-	var css_file = @"$(data_path)/custom.css";
+	var css_file = @"$(data_dir)/custom.css";
 	
 	css_theme.load_from_path (css_file);
 	Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), css_theme, Gtk.STYLE_PROVIDER_PRIORITY_USER);
@@ -301,10 +301,9 @@ public void show_welcome () {
 
 public void new_webapp (int index, bool notify = true, string overide = "false") {
 	var launcher = LauncherEntry.get_for_desktop_id ("iViewer.desktop");
-	var new_iViewer = new SimpleCommand (@"$(data_path)", "./iViewer");
+	var new_iViewer = new SimpleCommand (@"$(data_dir)", "./iViewer");
 	var webapp = this.create_web_window (index, overide);
 	dont_exit = true;
-	//headerbar.set_decoration_layout ("minimize");
 	
 	//HeaderBar Buttons	
 	refresh_button = new ToolButton.from_stock (Gtk.Stock.REFRESH);
@@ -342,9 +341,6 @@ public void new_webapp (int index, bool notify = true, string overide = "false")
 		view.notify.connect (() => { 
 			string temp;
 			temp = view.title;
-			//if (app.visible == true) notification.set_urgency (Urgency.CRITICAL);
-			//else notification.set_urgency (Urgency.NORMAL);
-			//notification.show ();
 			notification.set_urgency (Urgency.CRITICAL);
 			if (temp != "New Message") this.title = view.title;
 			if (temp == "New Message" && view.has_focus == false && timer.elapsed () > 9) { //Show notification
@@ -438,7 +434,6 @@ public int new_window () {
 public MyApp () {
 	//this.set_application (application);
 	// Don't create a new window, if one already exists
-    
 	if (new_window() == 0) {
 	
 	this.destroy.connect (Gtk.main_quit);
@@ -462,10 +457,9 @@ public static int main (string[] args) {
 	
 		var iviewer = new iViewer ();
 		iviewer.run (args);
-		//iviewer.activate ();	
 		Gtk.main ();
-		//notification.close ();
-
+		
 	return 0;
 	}
 }}
+
