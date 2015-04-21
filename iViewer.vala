@@ -43,6 +43,7 @@ namespace iMessage {
 	public Box box;
 	public InfoBar infobar;
 	public AppWindow window; 
+	public LauncherEntry launcher;
 
 	public int main_index;	
 	public int messages = 0;
@@ -190,7 +191,7 @@ public class AppWindow : ApplicationWindow {
 	}
 	
 	public void new_webapp (int index, bool notify = true, string overide = "false") {
-		var launcher = LauncherEntry.get_for_desktop_id ("iViewer.desktop");
+		launcher = LauncherEntry.get_for_desktop_id ("iViewer.desktop");
 		var new_iViewer = new SimpleCommand (@"$(data_dir)", "./iViewer");
 		var webapp = this.create_web_window (index, overide);
 		dont_exit = true;
@@ -233,12 +234,13 @@ public class AppWindow : ApplicationWindow {
 				string temp;
 				temp = view.title;
 				notification.set_urgency (Urgency.CRITICAL);
-				visible_notification = true;
+				
 				if (temp != "New Message") this.title = view.title;
 				if (temp == "New Message" && view.has_focus == false && timer.elapsed () > 9) { //Show notification
 					messages++;
 					timer.reset ();
 					launcher.count = messages;	
+					visible_notification = true;
 					launcher.count_visible = true;
 					launcher.urgent = true;
 					if (messages == 1) notification.update ("iMessage", "New message", "iViewer");
@@ -246,12 +248,13 @@ public class AppWindow : ApplicationWindow {
 					notification.show ();		
 				}
 			});
-			window.focus_in_event.connect (() => {
+			this.focus_in_event.connect (() => {
 				if (visible_notification == true) { 
 					notification.close ();
 					visible_notification = false;
 					
 				}
+				//stdout.printf ("Window Focused\n");
 				launcher.count_visible = false;
 				messages = 0;
 				return false;
@@ -354,6 +357,8 @@ public class ExampleApp : Gtk.Application {
       		running = true;
       		window.iViewer ();
       	} else {
+      		launcher.count_visible = false;
+			messages = 0;
       		try {
 				notification.close ();
 			} catch (Error e) {
@@ -373,7 +378,6 @@ int main (string[] args) {
     return new ExampleApp ().run (args);
 }
 
-//--------------------------------------------------------------------------------------------------
 public class Device_Dialog : Gtk.Dialog { //New device dialog
 
 	public signal void connect_device (string url);
