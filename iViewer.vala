@@ -74,6 +74,8 @@ public class AppWindow : ApplicationWindow {
 		show_all ();
 		show ();
     	present ();
+    	
+    	set_focus (null);
 	}
 	
 	public Welcome WelcomeWindow () {
@@ -225,13 +227,13 @@ public class AppWindow : ApplicationWindow {
 			messages = 0;
 			
 			notification.show ();
-			visible_notification = true;
 			notification = new Notify.Notification (summary, body, icon);
 			
 			view.notify.connect (() => { 
 				string temp;
 				temp = view.title;
 				notification.set_urgency (Urgency.CRITICAL);
+				visible_notification = true;
 				if (temp != "New Message") this.title = view.title;
 				if (temp == "New Message" && view.has_focus == false && timer.elapsed () > 9) { //Show notification
 					messages++;
@@ -248,6 +250,7 @@ public class AppWindow : ApplicationWindow {
 				if (visible_notification == true) { 
 					notification.close ();
 					visible_notification = false;
+					
 				}
 				launcher.count_visible = false;
 				messages = 0;
