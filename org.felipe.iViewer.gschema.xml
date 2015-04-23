@@ -5,21 +5,21 @@
       <default l10n="messages">""</default>
       <summary>Address to shortcut 1</summary>
       <description>
-           iP Address of the iDevice
+           iP Address of the iDevice 1
       </description>
     </key>
     <key name="address1" type="s">
       <default l10n="messages">""</default>
       <summary>Address to shortcut 2</summary>
       <description>
-            iP Address of the iDevice
+            iP Address of the iDevice 2
       </description>
     </key>
     <key name="address2" type="s">
       <default l10n="messages">""</default>
       <summary>Address to shortcut 3</summary>
       <description>
-           iP Address of the iDevice
+           iP Address of the iDevice 3
       </description>
     </key>
     
@@ -27,7 +27,7 @@
       <default>-1</default>
       <summary>type of button</summary>
       <description>
-       0 = add new button
+       -1 = empty
        1 = iphone
        2 = ipad
        3 = ipod
@@ -37,7 +37,7 @@
       <default>-1</default>
       <summary>type of button</summary>
       <description>
-       0 = add new button
+       -1 = empty
        1 = iphone
        2 = ipad
        3 = ipod
@@ -47,7 +47,7 @@
       <default>-1</default>
       <summary>type of button</summary>
       <description>
-       0 = add new button
+       -1 = empty
        1 = iphone
        2 = ipad
        3 = ipod

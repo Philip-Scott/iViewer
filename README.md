@@ -1,21 +1,14 @@
 # iViewer
 
-iViewer is an iMessage client for elementary OS. Remote messages is a tweak for jailbroken iDevices that allowes you to access your iMessages from a web browser. The app is actually a WebKit application, but I made it so you can receive notifications from it, and you can have different devices "registered" with it for quick and easy access. It also contains a theme for the tweak so the application will look and feel like a native elementary app. [Here](https://plus.google.com/116970085465259483479/videos?pid=6108073479399775314&oid=116970085465259483479) is a quick explination on how it works 
+iViewer is an iMessage client for elementary OS. Remote messages is a tweak for jailbroken iDevices that allowes you to access your iMessages from a web browser. With this app, remote messages can easily and seamlessly integrate with the elementary desktop. With it you can receive notifications, and you can have up to 3 different devices "registered" for quick and easy one click access. It also contains a theme for the jailbreak tweak so the application will look and feel like a native elementary app. [Here](https://plus.google.com/116970085465259483479/videos?pid=6108073479399775314&oid=116970085465259483479) is a quick explination on how it works 
 
 ![Screenshot](screenshot.png)
 
 ## Instalation 
 
 1. Jailbreak your idevice, install the "Remote Messages" tweak and enable it from your settings
-2. Edit the iViewer desktop file, and replace "###YOUR USERNAME####" with your username
-3. Place the desktop file in YOUR_HOME_DIR/.local/share/applications
-4. Place the iViewer folder in YOUR_HOME_DIR/.local/
-5. In the iViewer folder, give "execute" permissions to the "iViewer" executable
-6. in the terminal, cd to this directory, and execute:
-
-* sudo cp org.felipe.iViewer.gschema.xml /usr/share/glib-2.0/schemas/
-* sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
-
+2. In the iViewer folder, execute:
+  * ./install.sh 
 
 ## How to compile this app
 

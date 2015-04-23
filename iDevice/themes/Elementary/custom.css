@@ -226,11 +226,12 @@ border-bottom: solid 1px #e6e6e6;
 }
 #messages .me.sms .text {
 	color: #333333;
-	background-image: linear-gradient(bottom, #d3e4f2 0%, #ebf6fb 100%);
-	background-image: -o-linear-gradient(bottom, #d3e4f2 0%, #ebf6fb 100%);
-	background-image: -moz-linear-gradient(bottom, #d3e4f2 0%, #ebf6fb 100%);
-	background-image: -webkit-linear-gradient(bottom, #d3e4f2 0%, #ebf6fb 100%);
-	background-image: -ms-linear-gradient(bottom, #d3e4f2 0%, #ebf6fb 100%);
+	border: solid 1px #79e17b;
+	background-image: linear-gradient(bottom, #d3f2d5 0%, #eefbeb 100%);
+	background-image: -o-linear-gradient(bottom, #d3f2d5 0%, #eefbeb 100%);
+	background-image: -moz-linear-gradient(bottom, #d3f2d5 0%, #eefbeb 100%);
+	background-image: -webkit-linear-gradient(bottom, #d3f2d5 0%, #eefbeb 100%);
+	background-image: -ms-linear-gradient(bottom, #d3f2d5 0%, #eefbeb 100%);
 }
 
 #messages .pending .text {
