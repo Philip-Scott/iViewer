@@ -7,11 +7,8 @@ iViewer is an iMessage client for elementary OS. Remote messages is a tweak for 
 ## Instalation 
 
 1. Jailbreak your idevice, install the "Remote Messages" tweak and enable it from your settings
-2. Place the iViewer folder in /usr/share/
-3. In the iViewer folder, execute:
-  * sudo cp org.felipe.iViewer.gschema.xml /usr/share/glib-2.0/schemas/
-  * sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
-  * sudo apt-get install libwebkit2gtk-3.0-25
+2. In the iViewer folder, execute:
+  * ./install.sh 
 
 ## How to compile this app
 

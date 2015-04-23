@@ -11,15 +11,6 @@
 valac-0.26 --pkg gtk+-3.0 --pkg webkit2gtk-3.0 --pkg libnotify --pkg granite --pkg unity --thread --target-glib 2.32 iViewer.vala && ./iViewer
 	sudo cp org.felipe.iViewer*.xml /usr/share/glib-2.0/schemas/
 	sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
-	
-	TODO:	
-			Use sliding animation when leaving welcome screen	
-			FIXED: 	If new address contains "http" or https, leave as is	
-					When new device dialog is closed via X, i cannot open a new one (Disable the close button)
-					Dialog window won't open if a previous device was removed....
-					"Pakage" the app for an easyer install (Don't use ~/.local)
-					Fix Notification Icon
-					Run in background
 */
 using GLib;
 using Gtk;
