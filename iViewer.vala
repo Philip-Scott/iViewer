@@ -119,14 +119,7 @@ public class AppWindow : ApplicationWindow {
 	public ScrolledWindow create_web_window (int index, string overide) {
 		this.remove (welcome);
 		view = new WebKit.WebView ();
-		
-		if (overide == "false") 
-			view.load_uri (URL[index]);
-		else  {
-			if (overide.contains ("http") == false) view.load_uri ("http://" + overide);
-			else view.load_uri (overide);
-		}
- 		
+		 		
 		var settingss = new WebKit.Settings ();
  		settingss.enable_smooth_scrolling = true;
  		settingss.enable_media_stream = true;
@@ -140,8 +133,20 @@ public class AppWindow : ApplicationWindow {
 		settingss.set_default_font_size (12);
 		
 	 	view.set_settings (settingss);
-		//view.settings.enable_webaudio = true;
-	
+	 	
+	 	var username = GLib.Environment.get_user_name ();
+	 	
+	 	view.set_settings (settingss);
+		view.get_context ().get_cookie_manager ().set_accept_policy (WebKit.CookieAcceptPolicy.ALWAYS);
+		view.get_context ().get_cookie_manager ().set_persistent_storage (@"/home/$username/.iViewerData.txt", WebKit.CookiePersistentStorage.TEXT);
+	 			
+		if (overide == "false") 
+			view.load_uri (URL[index]);
+		else  {
+			if (overide.contains ("http") == false) view.load_uri ("http://" + overide);
+			else view.load_uri (overide);
+		}
+		
 		var scrolled_window = new ScrolledWindow (null, null);
 		scrolled_window.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
 		scrolled_window.add (view);
@@ -471,8 +476,7 @@ public class Device_Dialog : Gtk.Dialog { //New device dialog
 			running = false;
 		});
 	}
-}
-	
+}	
 
 }
 
