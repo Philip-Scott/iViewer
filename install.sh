@@ -24,3 +24,5 @@ sudo chmod 644 /usr/share/icons/hicolor/48x48/apps/iViewer.svg
 sudo chmod 644 /usr/share/icons/hicolor/64x64/apps/iViewer.svg
 sudo chmod 644 /usr/share/icons/hicolor/128x128/apps/iViewer.svg
 sudo chmod 644 /usr/share/icons/hicolor/scalable/apps/iViewer.svg
+
+sudo gtk-update-icon-cache /usr/share/icons/hicolor
